@@ -2,6 +2,7 @@ namespace ToDoApi.Models
 {
     public class WeatherForecast
     {
+        public long Id { get; set; }
         public DateOnly Date { get; set; }
 
         public int TemperatureC { get; set; }
