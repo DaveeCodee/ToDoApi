@@ -28,14 +28,8 @@ namespace ToDoApi.Controllers
         [HttpGet(Name = "WeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Id = 1,
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return _memoryDbContext.WeatherForecasts.ToList();
+           
         }
 
         [HttpGet(Name = "WeatherForecast/{id}")]
@@ -69,6 +63,31 @@ namespace ToDoApi.Controllers
             await _memoryDbContext.SaveChangesAsync();
 
             return newForecast;
+        }
+
+        //I'm trying to create another function to edit it but i've not gotten a way around it
+
+
+        [HttpPut(Name = "EditWeatherForcast")]
+        public async Task<ActionResult<WeatherForecast>> EditForecast(long id, int year, int month, int day, int tempC, string summary)
+        {
+           
+            var dateTicks = new DateTime(year, month, day, 0, 0, 0, 0,
+                   new CultureInfo("en-US", false).Calendar).Ticks;
+            var date = new DateTime(dateTicks);
+            WeatherForecast wedd = new WeatherForecast
+            {
+                Date = DateOnly.FromDateTime(date),
+                TemperatureC = tempC,
+                Summary = summary
+            };
+           if (wedd == null)
+           { 
+               return NotFound(); 
+           }
+            await _memoryDbContext.WeatherForecasts.FindAsync(id);
+            await _memoryDbContext.SaveChangesAsync();
+            return wedd;
         }
     }
 }
