@@ -28,14 +28,8 @@ namespace ToDoApi.Controllers
         [HttpGet(Name = "WeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Id = 1,
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return _memoryDbContext.WeatherForecasts.ToList();
+           
         }
 
         [HttpGet(Name = "WeatherForecast/{id}")]
@@ -69,6 +63,30 @@ namespace ToDoApi.Controllers
             await _memoryDbContext.SaveChangesAsync();
 
             return newForecast;
+
         }
+
+        
+
+        [HttpDelete(Name ="DeleteForecast/{id}")]
+        public async Task<ActionResult<WeatherForecast>> DeleteById(long id)
+        {
+            WeatherForecast delete = new WeatherForecast
+            {
+                Id = id
+            };
+              _memoryDbContext.WeatherForecasts.Remove(delete);
+            await _memoryDbContext.SaveChangesAsync();
+            return delete;
+        }
+
+       
+
+
+        //[HttpPut(Name = "EditWeatherForcast")]
+        //public async Task<ActionResult<WeatherForecast>> EditForecast()
+        //{
+            
+        //}
     }
 }
