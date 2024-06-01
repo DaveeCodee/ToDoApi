@@ -66,16 +66,27 @@ namespace ToDoApi.Controllers
 
         }
 
-        //I'm trying to create another function to edit it but i've not gotten a way around it
+        
+
+        [HttpDelete(Name ="DeleteForecast/{id}")]
+        public async Task<ActionResult<WeatherForecast>> DeleteById(long id)
+        {
+            WeatherForecast delete = new WeatherForecast
+            {
+                Id = id
+            };
+              _memoryDbContext.WeatherForecasts.Remove(delete);
+            await _memoryDbContext.SaveChangesAsync();
+            return delete;
+        }
+
+       
 
 
         //[HttpPut(Name = "EditWeatherForcast")]
         //public async Task<ActionResult<WeatherForecast>> EditForecast()
         //{
-
-
-
-        //    await _memoryDbContext.SaveChangesAsync();
+            
         //}
     }
 }
