@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoApi.Models;
 using ToDoApi.DatabaseContext;
 using System.Globalization;
+using System.Linq;
 
 namespace ToDoApi.Controllers
 {
@@ -31,6 +32,11 @@ namespace ToDoApi.Controllers
             return _memoryDbContext.WeatherForecasts.ToList();
            
         }
+        [HttpGet("ReverseForecast")]
+        public IEnumerable<WeatherForecast> GetReverse()
+        {
+            return _memoryDbContext.WeatherForecasts.ToList().AsEnumerable().Reverse().ToList();
+        }
 
         [HttpGet(Name = "WeatherForecast/{id}")]
         public async Task<ActionResult<WeatherForecast>> GetById(long id)
@@ -49,7 +55,7 @@ namespace ToDoApi.Controllers
         public async Task<WeatherForecast> CreateNewForecast(
             int year, int month, int day, int tempC, string summary)
         {
-            var dateTicks = new DateTime(year, month, day, 0, 0, 0, 0,
+            var dateTicks = new DateTime(year, month, day,
                     new CultureInfo("en-US", false).Calendar).Ticks;
             var date = new DateTime(dateTicks);
             WeatherForecast newForecast =  new WeatherForecast
@@ -66,27 +72,17 @@ namespace ToDoApi.Controllers
 
         }
 
-        
-
-        [HttpDelete(Name ="DeleteForecast/{id}")]
+        [HttpDelete(Name = "DeleteForecast/{id}")]
         public async Task<ActionResult<WeatherForecast>> DeleteById(long id)
         {
-            WeatherForecast delete = new WeatherForecast
-            {
-                Id = id
-            };
-              _memoryDbContext.WeatherForecasts.Remove(delete);
+            var del = await _memoryDbContext.WeatherForecasts.FindAsync(id);
+            if (del == null) { return NotFound(); }
+
+            _memoryDbContext.WeatherForecasts.Remove(del);
             await _memoryDbContext.SaveChangesAsync();
-            return delete;
+            return NoContent();
         }
 
        
-
-
-        //[HttpPut(Name = "EditWeatherForcast")]
-        //public async Task<ActionResult<WeatherForecast>> EditForecast()
-        //{
-            
-        //}
     }
 }
